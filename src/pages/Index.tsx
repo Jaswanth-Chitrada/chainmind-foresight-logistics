@@ -1,11 +1,22 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import Header from '@/components/Header';
+import AlertsSidebar from '@/components/AlertsSidebar';
+import MapDashboard from '@/components/MapDashboard';
+import BottomPanel from '@/components/BottomPanel';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-logistics-dark p-4">
+      <div className="max-w-[1600px] mx-auto">
+        <Header />
+        
+        <div className="flex gap-6 mb-6">
+          <AlertsSidebar />
+          <MapDashboard />
+        </div>
+        
+        <BottomPanel />
       </div>
     </div>
   );

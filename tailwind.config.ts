@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom colors for logistics theme
+				logistics: {
+					dark: '#0a0b0d',
+					surface: '#1a1b1e',
+					panel: '#252629',
+					accent: '#3b82f6',
+					warning: '#f59e0b',
+					danger: '#ef4444',
+					success: '#10b981',
+					glow: '#60a5fa'
 				}
 			},
 			borderRadius: {
@@ -84,11 +96,35 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				pulse: {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.5' }
+				},
+				glow: {
+					'0%, 100%': { 
+						boxShadow: '0 0 5px rgba(96, 165, 250, 0.5)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 20px rgba(96, 165, 250, 0.8), 0 0 30px rgba(96, 165, 250, 0.4)' 
+					}
+				},
+				slideIn: {
+					'0%': { transform: 'translateX(-100%)', opacity: '0' },
+					'100%': { transform: 'translateX(0)', opacity: '1' }
+				},
+				fadeIn: {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'glow': 'glow 2s ease-in-out infinite alternate',
+				'slide-in': 'slideIn 0.3s ease-out',
+				'fade-in': 'fadeIn 0.5s ease-out'
 			}
 		}
 	},
