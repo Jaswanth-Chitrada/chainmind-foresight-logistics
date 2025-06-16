@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Warehouse, Truck } from 'lucide-react';
+import { Warehouse, Truck } from 'lucide-react';
+import MapComponent from './MapComponent';
 
 const MapDashboard = () => {
   const [selectedWarehouse, setSelectedWarehouse] = useState<string | null>(null);
@@ -15,39 +16,30 @@ const MapDashboard = () => {
     { id: '5', name: 'Kolkata East', lat: 22.5726, lng: 88.3639, status: 'operational', inventory: 1879 }
   ];
 
-  const routes = [
-    { from: 'Mumbai Central', to: 'Pune', status: 'active', vehicles: 3 },
-    { from: 'Delhi North', to: 'Gurgaon', status: 'delayed', vehicles: 2 },
-    { from: 'Chennai Port', to: 'Bangalore Tech', status: 'rerouted', vehicles: 1 },
-    { from: 'Bangalore Tech', to: 'Hyderabad', status: 'active', vehicles: 4 }
-  ];
+  const mapDisruptions = warehouses.map(warehouse => ({
+    id: warehouse.id,
+    location: warehouse.name,
+    coordinates: [warehouse.lng, warehouse.lat] as [number, number],
+    type: warehouse.status === 'warning' ? 'Storm Warning' : 'Operational',
+    severity: warehouse.status === 'warning' ? 'moderate' as const : 'low' as const,
+    description: warehouse.status === 'warning' ? 
+      `Storm warning detected - ${warehouse.inventory} items in inventory` :
+      `Operational - ${warehouse.inventory} items in inventory`,
+    confidence: 95,
+    eta: warehouse.status === 'warning' ? '2 hours' : 'N/A'
+  }));
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'operational': return 'bg-green-500';
       case 'warning': return 'bg-yellow-500';
       case 'critical': return 'bg-red-500';
-      case 'active': return 'bg-blue-500';
-      case 'delayed': return 'bg-orange-500';
-      case 'rerouted': return 'bg-purple-500';
       default: return 'bg-gray-500';
     }
   };
 
   return (
     <div className="flex-1 glass-panel p-6 relative overflow-hidden">
-      {/* Map Background with Grid */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="w-full h-full bg-gradient-to-br from-logistics-accent/20 to-logistics-glow/20"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(96, 165, 250, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(96, 165, 250, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}></div>
-      </div>
-      
       {/* Map Header */}
       <div className="relative z-10 flex items-center justify-between mb-6">
         <div>
@@ -63,63 +55,45 @@ const MapDashboard = () => {
         </div>
       </div>
 
-      {/* Simulated Map Interface */}
-      <div className="relative z-10 flex-1 bg-logistics-dark/50 rounded-lg border border-white/10 p-6 min-h-[500px]">
-        {/* Warehouses Grid */}
-        <div className="grid grid-cols-3 gap-8 h-full">
-          {warehouses.map((warehouse, index) => (
-            <div
-              key={warehouse.id}
-              className={`relative cursor-pointer transition-all duration-300 ${
-                selectedWarehouse === warehouse.id ? 'scale-110' : 'hover:scale-105'
-              }`}
-              style={{
-                gridRow: Math.floor(index / 2) + 1,
-                gridColumn: (index % 3) + 1,
-                transform: `translate(${index * 20}px, ${index * 15}px)`
-              }}
-              onClick={() => setSelectedWarehouse(warehouse.id)}
-            >
-              <Card className="bg-logistics-panel/80 border-white/20 p-4 hover:border-logistics-accent/50 transition-all">
-                <div className="flex items-center space-x-3">
-                  <div className={`p-2 rounded-lg ${getStatusColor(warehouse.status)} ${warehouse.status === 'warning' ? 'animate-pulse' : ''}`}>
-                    <Warehouse className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-white text-sm">{warehouse.name}</h3>
-                    <p className="text-xs text-gray-400">{warehouse.inventory} items</p>
-                  </div>
-                </div>
-                
-                {warehouse.status === 'warning' && (
-                  <div className="mt-2 text-xs text-yellow-400 animate-fade-in">
-                    ⚠️ Storm warning detected
-                  </div>
-                )}
-              </Card>
-            </div>
-          ))}
-        </div>
+      {/* Interactive Map */}
+      <div className="relative z-10 mb-4">
+        <MapComponent 
+          disruptions={mapDisruptions}
+          onDisruptionClick={(disruption) => setSelectedWarehouse(disruption.id)}
+        />
+      </div>
 
-        {/* Animated Routes */}
-        {routes.map((route, index) => (
-          <div
-            key={index}
-            className="absolute top-1/2 left-1/4 w-1/2 h-0.5 bg-gradient-to-r from-logistics-accent/50 to-logistics-glow/50 transform -translate-y-1/2"
-            style={{
-              transform: `rotate(${index * 15}deg) translateY(-50%)`,
-              transformOrigin: 'left center'
-            }}
+      {/* Warehouse Cards */}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        {warehouses.map((warehouse) => (
+          <Card 
+            key={warehouse.id} 
+            className={`bg-logistics-panel/80 border-white/20 p-4 cursor-pointer transition-all ${
+              selectedWarehouse === warehouse.id ? 'border-logistics-accent/50 scale-105' : 'hover:border-logistics-accent/30'
+            }`}
+            onClick={() => setSelectedWarehouse(warehouse.id)}
           >
-            <div className={`absolute right-0 top-1/2 transform -translate-y-1/2 ${getStatusColor(route.status)} rounded-full p-1`}>
-              <Truck className="w-3 h-3 text-white" />
+            <div className="flex items-center space-x-3">
+              <div className={`p-2 rounded-lg ${getStatusColor(warehouse.status)} ${warehouse.status === 'warning' ? 'animate-pulse' : ''}`}>
+                <Warehouse className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-white text-sm">{warehouse.name}</h3>
+                <p className="text-xs text-gray-400">{warehouse.inventory} items</p>
+              </div>
             </div>
-          </div>
+            
+            {warehouse.status === 'warning' && (
+              <div className="mt-2 text-xs text-yellow-400">
+                ⚠️ Storm warning detected
+              </div>
+            )}
+          </Card>
         ))}
       </div>
 
       {/* Legend */}
-      <div className="relative z-10 mt-4 grid grid-cols-4 gap-4 text-xs">
+      <div className="relative z-10 grid grid-cols-4 gap-4 text-xs">
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           <span className="text-gray-400">Operational</span>

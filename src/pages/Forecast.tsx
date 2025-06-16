@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, MapPin, TrendingUp, AlertTriangle } from 'lucide-react';
+import { RefreshCw, TrendingUp, AlertTriangle } from 'lucide-react';
+import MapComponent from '@/components/MapComponent';
 
 const Forecast = () => {
+  const [selectedDisruption, setSelectedDisruption] = useState<any>(null);
+
   const predictions = [
     {
       region: 'Mumbai Zone',
@@ -33,12 +36,52 @@ const Forecast = () => {
     },
   ];
 
-  const disruptionHotspots = [
-    { location: 'Chennai', type: 'Weather', level: 'severe' },
-    { location: 'Mumbai', type: 'Traffic', level: 'moderate' },
-    { location: 'Bangalore', type: 'Festival', level: 'low' },
-    { location: 'Delhi', type: 'Strike', level: 'severe' },
+  const mapDisruptions = [
+    {
+      id: '1',
+      location: 'Mumbai',
+      coordinates: [72.8777, 19.0760] as [number, number],
+      type: 'Heavy Rainfall',
+      severity: 'severe' as const,
+      description: 'Expected 6-8 hour delays due to flooding',
+      confidence: 87,
+      eta: '2 hours'
+    },
+    {
+      id: '2',
+      location: 'Chennai',
+      coordinates: [80.2707, 13.0827] as [number, number],
+      type: 'Local Festival',
+      severity: 'moderate' as const,
+      description: 'High demand spike expected during festival',
+      confidence: 92,
+      eta: '1 day'
+    },
+    {
+      id: '3',
+      location: 'Delhi',
+      coordinates: [77.1025, 28.7041] as [number, number],
+      type: 'Truckers Strike',
+      severity: 'severe' as const,
+      description: 'Major route disruptions expected',
+      confidence: 73,
+      eta: '12 hours'
+    },
+    {
+      id: '4',
+      location: 'Bangalore',
+      coordinates: [77.5946, 12.9716] as [number, number],
+      type: 'Traffic Congestion',
+      severity: 'low' as const,
+      description: 'Minor delays due to road construction',
+      confidence: 65,
+      eta: '6 hours'
+    }
   ];
+
+  const handleDisruptionClick = (disruption: any) => {
+    setSelectedDisruption(disruption);
+  };
 
   return (
     <div className="space-y-6">
@@ -51,36 +94,34 @@ const Forecast = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Disruption Map Placeholder */}
+        {/* Interactive Disruption Map */}
         <div className="lg:col-span-2">
           <Card className="glass-panel border-white/10">
             <CardHeader>
               <CardTitle className="text-white flex items-center">
-                <MapPin className="w-5 h-5 mr-2" />
-                Disruption Map
+                <TrendingUp className="w-5 h-5 mr-2" />
+                Live Disruption Map
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-96 bg-logistics-panel/30 rounded-lg flex items-center justify-center">
-                <div className="text-center text-gray-400">
-                  <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Interactive Mapbox disruption map</p>
-                  <p className="text-sm">Red/orange/yellow zones showing risk levels</p>
-                </div>
-              </div>
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                {disruptionHotspots.map((spot, index) => (
-                  <div key={index} className="p-2 rounded-lg bg-logistics-panel/30 text-center">
-                    <div className={`w-3 h-3 rounded-full mx-auto mb-1 ${
-                      spot.level === 'severe' ? 'bg-red-500' :
-                      spot.level === 'moderate' ? 'bg-yellow-500' :
-                      'bg-blue-500'
-                    }`} />
-                    <p className="text-xs text-white">{spot.location}</p>
-                    <p className="text-xs text-gray-400">{spot.type}</p>
+              <MapComponent 
+                disruptions={mapDisruptions}
+                onDisruptionClick={handleDisruptionClick}
+              />
+              
+              {selectedDisruption && (
+                <div className="mt-4 p-4 bg-logistics-panel/30 rounded-lg border border-white/10">
+                  <h4 className="text-white font-medium mb-2">Selected: {selectedDisruption.location}</h4>
+                  <p className="text-logistics-accent text-sm">{selectedDisruption.type}</p>
+                  <p className="text-gray-400 text-sm mt-1">{selectedDisruption.description}</p>
+                  <div className="flex justify-between mt-2 text-xs">
+                    <Badge variant={selectedDisruption.severity === 'severe' ? 'destructive' : 'secondary'}>
+                      {selectedDisruption.severity.toUpperCase()}
+                    </Badge>
+                    <span className="text-logistics-success">{selectedDisruption.confidence}% confidence</span>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
