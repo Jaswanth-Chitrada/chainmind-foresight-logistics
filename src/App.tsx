@@ -27,6 +27,7 @@ const App = () => (
             <Route path="forecast" element={<Forecast />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="procurement" element={<Procurement />} />
+            <Route path="optimization" element={<Optimization />} />
             <Route path="simulation" element={<SimulationLab />} />
           </Route>
           <Route path="*" element={<NotFound />} />
