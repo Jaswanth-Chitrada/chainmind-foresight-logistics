@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Forecast from "./pages/Forecast";
 import Inventory from "./pages/Inventory";
 import Procurement from "./pages/Procurement";
+import Optimization from "./pages/Optimization";
 import SimulationLab from "./pages/SimulationLab";
 import NotFound from "./pages/NotFound";
 
