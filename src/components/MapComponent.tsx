@@ -1,11 +1,8 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Icon, divIcon } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface DisruptionData {
   id: string;
@@ -24,11 +21,6 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ disruptions, onDisruptionClick }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [tokenSet, setTokenSet] = useState<boolean>(false);
-
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'severe': return '#ef4444'; // red
@@ -38,98 +30,59 @@ const MapComponent: React.FC<MapComponentProps> = ({ disruptions, onDisruptionCl
     }
   };
 
-  const initializeMap = () => {
-    if (!mapContainer.current || !mapboxToken) return;
-
-    mapboxgl.accessToken = mapboxToken;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [77.2090, 28.6139], // Delhi, India
-      zoom: 5,
-    });
-
-    map.current.on('load', () => {
-      // Add markers for disruptions
-      disruptions.forEach((disruption) => {
-        const marker = new mapboxgl.Marker({
-          color: getSeverityColor(disruption.severity),
-          scale: 1.2
-        })
-          .setLngLat(disruption.coordinates)
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 })
-              .setHTML(`
-                <div class="p-3 bg-logistics-dark text-white rounded-lg border border-white/20">
-                  <h3 class="font-semibold text-logistics-accent">${disruption.location}</h3>
-                  <p class="text-sm text-gray-300 mt-1">${disruption.type}</p>
-                  <p class="text-xs text-gray-400 mt-2">${disruption.description}</p>
-                  <div class="flex justify-between mt-2 text-xs">
-                    <span class="text-logistics-success">${disruption.confidence}% confidence</span>
-                    <span class="text-gray-400">ETA: ${disruption.eta}</span>
-                  </div>
-                </div>
-              `)
-          );
-
-        if (onDisruptionClick) {
-          marker.getElement().addEventListener('click', () => {
-            onDisruptionClick(disruption);
-          });
-        }
-
-        marker.addTo(map.current!);
-      });
+  const createCustomIcon = (severity: string) => {
+    const color = getSeverityColor(severity);
+    return divIcon({
+      html: `<div style="
+        background-color: ${color};
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      "></div>`,
+      className: 'custom-marker',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
     });
   };
-
-  const handleTokenSubmit = () => {
-    if (mapboxToken.trim()) {
-      setTokenSet(true);
-      setTimeout(() => {
-        initializeMap();
-      }, 100);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (map.current) {
-        map.current.remove();
-      }
-    };
-  }, []);
-
-  if (!tokenSet) {
-    return (
-      <Card className="glass-panel border-white/10 p-6">
-        <div className="text-center space-y-4">
-          <h3 className="text-white font-medium">Configure Mapbox Token</h3>
-          <p className="text-gray-400 text-sm">
-            To display the interactive map, please enter your Mapbox public token.
-            You can get one from <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-logistics-accent hover:underline">mapbox.com</a>
-          </p>
-          <div className="flex space-x-2 max-w-md mx-auto">
-            <Input
-              type="text"
-              placeholder="pk.eyJ1..."
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-              className="bg-logistics-panel border-white/20 text-white"
-            />
-            <Button onClick={handleTokenSubmit} className="bg-logistics-accent hover:bg-logistics-accent/80">
-              Set Token
-            </Button>
-          </div>
-        </div>
-      </Card>
-    );
-  }
 
   return (
     <div className="relative">
-      <div ref={mapContainer} className="w-full h-96 rounded-lg border border-white/10" />
+      <MapContainer
+        center={[28.6139, 77.2090]} // Delhi, India
+        zoom={5}
+        className="w-full h-96 rounded-lg border border-white/10"
+        style={{ height: '384px' }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        
+        {disruptions.map((disruption) => (
+          <Marker
+            key={disruption.id}
+            position={[disruption.coordinates[1], disruption.coordinates[0]]}
+            icon={createCustomIcon(disruption.severity)}
+            eventHandlers={{
+              click: () => onDisruptionClick?.(disruption),
+            }}
+          >
+            <Popup className="custom-popup">
+              <div className="p-3 bg-logistics-dark text-white rounded-lg border border-white/20 min-w-[200px]">
+                <h3 className="font-semibold text-logistics-accent">{disruption.location}</h3>
+                <p className="text-sm text-gray-300 mt-1">{disruption.type}</p>
+                <p className="text-xs text-gray-400 mt-2">{disruption.description}</p>
+                <div className="flex justify-between mt-2 text-xs">
+                  <span className="text-logistics-success">{disruption.confidence}% confidence</span>
+                  <span className="text-gray-400">ETA: {disruption.eta}</span>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
       
       {/* Legend */}
       <div className="absolute bottom-4 left-4 bg-logistics-dark/90 p-3 rounded-lg border border-white/10">

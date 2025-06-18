@@ -11,12 +11,14 @@ import Inventory from "./pages/Inventory";
 import Procurement from "./pages/Procurement";
 import RouteAgent from "./pages/RouteAgent";
 import NotFound from "./pages/NotFound";
+import LeafletStyles from "./components/LeafletStyles";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <LeafletStyles />
       <Toaster />
       <Sonner />
       <BrowserRouter>
