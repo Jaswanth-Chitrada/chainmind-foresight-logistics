@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,8 @@ import { Route, Truck, MapPin, Clock, Zap, AlertTriangle } from 'lucide-react';
 import MapComponent from '@/components/MapComponent';
 
 const RouteAgent = () => {
+  console.log('RouteAgent component rendering');
+  
   const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
 
   const warehouses = [
@@ -99,6 +100,8 @@ const RouteAgent = () => {
     eta: warehouse.status === 'maintenance' ? '6 hours' : 'N/A'
   }));
 
+  console.log('mapDisruptions:', mapDisruptions);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-500/20 text-green-400';
@@ -117,171 +120,181 @@ const RouteAgent = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Route Agent</h1>
-        <Button className="bg-logistics-accent hover:bg-logistics-accent/80">
-          <Zap className="w-4 h-4 mr-2" />
-          Optimize All Routes
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Warehouse Network Map */}
-        <div className="lg:col-span-2">
-          <Card className="glass-panel border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <MapPin className="w-5 h-5 mr-2" />
-                Warehouse Network
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MapComponent 
-                disruptions={mapDisruptions}
-                onDisruptionClick={(disruption) => setSelectedRoute(disruption.id)}
-              />
-              
-              {selectedRoute && (
-                <div className="mt-4 p-4 bg-logistics-panel/30 rounded-lg border border-white/10">
-                  <h4 className="text-white font-medium mb-2">
-                    Selected Warehouse: {mapDisruptions.find(d => d.id === selectedRoute)?.location}
-                  </h4>
-                  <p className="text-logistics-accent text-sm">
-                    {mapDisruptions.find(d => d.id === selectedRoute)?.type}
-                  </p>
-                  <p className="text-gray-400 text-sm mt-1">
-                    {mapDisruptions.find(d => d.id === selectedRoute)?.description}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+  try {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-white">Route Agent</h1>
+          <Button className="bg-logistics-accent hover:bg-logistics-accent/80">
+            <Zap className="w-4 h-4 mr-2" />
+            Optimize All Routes
+          </Button>
         </div>
 
-        {/* Route Optimization Suggestions */}
-        <div>
-          <Card className="glass-panel border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Zap className="w-5 h-5 mr-2" />
-                AI Suggestions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {routeOptimizations.map((opt, index) => (
-                  <div key={index} className="p-3 rounded-lg bg-logistics-panel/30 border border-white/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-medium text-white">{opt.routeId}</h4>
-                      <Badge className="bg-logistics-accent/20 text-logistics-accent text-xs">
-                        {opt.confidence}% confidence
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-300 mb-2">{opt.suggestion}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-logistics-success text-sm font-medium">
-                        Save: {opt.savings}
-                      </span>
-                      <div className="space-x-2">
-                        <Button size="sm" variant="outline" className="text-xs">
-                          Dismiss
-                        </Button>
-                        <Button size="sm" className="bg-logistics-success hover:bg-logistics-success/80 text-xs">
-                          Apply
-                        </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Warehouse Network Map */}
+          <div className="lg:col-span-2">
+            <Card className="glass-panel border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  Warehouse Network
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MapComponent 
+                  disruptions={mapDisruptions}
+                  onDisruptionClick={(disruption) => setSelectedRoute(disruption.id)}
+                />
+                
+                {selectedRoute && (
+                  <div className="mt-4 p-4 bg-logistics-panel/30 rounded-lg border border-white/10">
+                    <h4 className="text-white font-medium mb-2">
+                      Selected Warehouse: {mapDisruptions.find(d => d.id === selectedRoute)?.location}
+                    </h4>
+                    <p className="text-logistics-accent text-sm">
+                      {mapDisruptions.find(d => d.id === selectedRoute)?.type}
+                    </p>
+                    <p className="text-gray-400 text-sm mt-1">
+                      {mapDisruptions.find(d => d.id === selectedRoute)?.description}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Route Optimization Suggestions */}
+          <div>
+            <Card className="glass-panel border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Zap className="w-5 h-5 mr-2" />
+                  AI Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {routeOptimizations.map((opt, index) => (
+                    <div key={index} className="p-3 rounded-lg bg-logistics-panel/30 border border-white/10">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-white">{opt.routeId}</h4>
+                        <Badge className="bg-logistics-accent/20 text-logistics-accent text-xs">
+                          {opt.confidence}% confidence
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">{opt.suggestion}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-logistics-success text-sm font-medium">
+                          Save: {opt.savings}
+                        </span>
+                        <div className="space-x-2">
+                          <Button size="sm" variant="outline" className="text-xs">
+                            Dismiss
+                          </Button>
+                          <Button size="sm" className="bg-logistics-success hover:bg-logistics-success/80 text-xs">
+                            Apply
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Active Routes Table */}
-      <Card className="glass-panel border-white/10">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <Route className="w-5 h-5 mr-2" />
-            Active Transportation Routes
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-white/10">
-                <TableHead className="text-gray-300">Route ID</TableHead>
-                <TableHead className="text-gray-300">From</TableHead>
-                <TableHead className="text-gray-300">To</TableHead>
-                <TableHead className="text-gray-300">Distance</TableHead>
-                <TableHead className="text-gray-300">Duration</TableHead>
-                <TableHead className="text-gray-300">Cost</TableHead>
-                <TableHead className="text-gray-300">Trucks</TableHead>
-                <TableHead className="text-gray-300">Priority</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {activeRoutes.map((route) => (
-                <TableRow key={route.id} className="border-white/10">
-                  <TableCell className="text-white font-medium">{route.id}</TableCell>
-                  <TableCell className="text-gray-300">{route.from}</TableCell>
-                  <TableCell className="text-gray-300">{route.to}</TableCell>
-                  <TableCell className="text-white">{route.distance}</TableCell>
-                  <TableCell className="text-gray-300">{route.duration}</TableCell>
-                  <TableCell className="text-white">{route.cost}</TableCell>
-                  <TableCell className="text-gray-300 flex items-center">
-                    <Truck className="w-4 h-4 mr-1" />
-                    {route.trucks}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getPriorityColor(route.priority)}>
-                      {route.priority.toUpperCase()}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(route.status)}>
-                      {route.status === 'delayed' && <AlertTriangle className="w-3 h-3 mr-1" />}
-                      {route.status === 'active' && <Clock className="w-3 h-3 mr-1" />}
-                      {route.status.toUpperCase()}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Active Routes', value: '4', icon: Route, color: 'text-logistics-accent' },
-          { label: 'Total Distance', value: '6,380 km', icon: MapPin, color: 'text-logistics-success' },
-          { label: 'Trucks in Transit', value: '10', icon: Truck, color: 'text-logistics-warning' },
-          { label: 'Avg. Route Time', value: '23h 42m', icon: Clock, color: 'text-gray-400' }
-        ].map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index} className="glass-panel border-white/10">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <Icon className={`w-8 h-8 ${stat.color}`} />
-                  <div>
-                    <p className="text-2xl font-bold text-white">{stat.value}</p>
-                    <p className="text-sm text-gray-400">{stat.label}</p>
-                  </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
+          </div>
+        </div>
+
+        {/* Active Routes Table */}
+        <Card className="glass-panel border-white/10">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Route className="w-5 h-5 mr-2" />
+              Active Transportation Routes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/10">
+                  <TableHead className="text-gray-300">Route ID</TableHead>
+                  <TableHead className="text-gray-300">From</TableHead>
+                  <TableHead className="text-gray-300">To</TableHead>
+                  <TableHead className="text-gray-300">Distance</TableHead>
+                  <TableHead className="text-gray-300">Duration</TableHead>
+                  <TableHead className="text-gray-300">Cost</TableHead>
+                  <TableHead className="text-gray-300">Trucks</TableHead>
+                  <TableHead className="text-gray-300">Priority</TableHead>
+                  <TableHead className="text-gray-300">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {activeRoutes.map((route) => (
+                  <TableRow key={route.id} className="border-white/10">
+                    <TableCell className="text-white font-medium">{route.id}</TableCell>
+                    <TableCell className="text-gray-300">{route.from}</TableCell>
+                    <TableCell className="text-gray-300">{route.to}</TableCell>
+                    <TableCell className="text-white">{route.distance}</TableCell>
+                    <TableCell className="text-gray-300">{route.duration}</TableCell>
+                    <TableCell className="text-white">{route.cost}</TableCell>
+                    <TableCell className="text-gray-300 flex items-center">
+                      <Truck className="w-4 h-4 mr-1" />
+                      {route.trucks}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPriorityColor(route.priority)}>
+                        {route.priority.toUpperCase()}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(route.status)}>
+                        {route.status === 'delayed' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                        {route.status === 'active' && <Clock className="w-3 h-3 mr-1" />}
+                        {route.status.toUpperCase()}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Active Routes', value: '4', icon: Route, color: 'text-logistics-accent' },
+            { label: 'Total Distance', value: '6,380 km', icon: MapPin, color: 'text-logistics-success' },
+            { label: 'Trucks in Transit', value: '10', icon: Truck, color: 'text-logistics-warning' },
+            { label: 'Avg. Route Time', value: '23h 42m', icon: Clock, color: 'text-gray-400' }
+          ].map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={index} className="glass-panel border-white/10">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <Icon className={`w-8 h-8 ${stat.color}`} />
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stat.value}</p>
+                      <p className="text-sm text-gray-400">{stat.label}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error rendering RouteAgent:', error);
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-red-400">Route Agent - Error</h1>
+        <p className="text-red-300">Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+      </div>
+    );
+  }
 };
 
 export default RouteAgent;

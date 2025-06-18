@@ -21,6 +21,8 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ disruptions, onDisruptionClick }) => {
+  console.log('MapComponent rendering with disruptions:', disruptions);
+  
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'severe': return '#ef4444'; // red
@@ -47,63 +49,46 @@ const MapComponent: React.FC<MapComponentProps> = ({ disruptions, onDisruptionCl
     });
   };
 
-  return (
-    <div className="relative">
-      <MapContainer
-        center={[28.6139, 77.2090]} // Delhi, India
-        zoom={5}
-        className="w-full h-96 rounded-lg border border-white/10"
-        style={{ height: '384px' }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
+  // Temporarily return a simple div to test if the issue is with MapContainer
+  console.log('About to render MapComponent');
+  
+  try {
+    return (
+      <div className="relative">
+        <div className="w-full h-96 rounded-lg border border-white/10 bg-gray-800 flex items-center justify-center">
+          <p className="text-white">Map Loading... {disruptions.length} disruptions</p>
+        </div>
         
-        {disruptions.map((disruption) => (
-          <Marker
-            key={disruption.id}
-            position={[disruption.coordinates[1], disruption.coordinates[0]]}
-            icon={createCustomIcon(disruption.severity)}
-            eventHandlers={{
-              click: () => onDisruptionClick?.(disruption),
-            }}
-          >
-            <Popup className="custom-popup">
-              <div className="p-3 bg-logistics-dark text-white rounded-lg border border-white/20 min-w-[200px]">
-                <h3 className="font-semibold text-logistics-accent">{disruption.location}</h3>
-                <p className="text-sm text-gray-300 mt-1">{disruption.type}</p>
-                <p className="text-xs text-gray-400 mt-2">{disruption.description}</p>
-                <div className="flex justify-between mt-2 text-xs">
-                  <span className="text-logistics-success">{disruption.confidence}% confidence</span>
-                  <span className="text-gray-400">ETA: {disruption.eta}</span>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-      
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-logistics-dark/90 p-3 rounded-lg border border-white/10">
-        <h4 className="text-white text-sm font-medium mb-2">Disruption Levels</h4>
-        <div className="space-y-1 text-xs">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-gray-300">Severe</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <span className="text-gray-300">Moderate</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="text-gray-300">Low</span>
+        {/* Legend */}
+        <div className="absolute bottom-4 left-4 bg-logistics-dark/90 p-3 rounded-lg border border-white/10">
+          <h4 className="text-white text-sm font-medium mb-2">Disruption Levels</h4>
+          <div className="space-y-1 text-xs">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-gray-300">Severe</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <span className="text-gray-300">Moderate</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-gray-300">Low</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error rendering MapComponent:', error);
+    return (
+      <div className="relative">
+        <div className="w-full h-96 rounded-lg border border-red-500 bg-red-900/20 flex items-center justify-center">
+          <p className="text-red-400">Map Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default MapComponent;
