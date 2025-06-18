@@ -1,11 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Activity, TrendingUp, AlertTriangle, Truck } from 'lucide-react';
+import { RefreshCw, Activity, TrendingUp, AlertTriangle, Truck, MessageSquare } from 'lucide-react';
+import AgentChat from '@/components/AgentChat';
 
 const Dashboard = () => {
+  const [activeChat, setActiveChat] = useState<{
+    alertId: string;
+    agentName: string;
+    alertMessage: string;
+  } | null>(null);
+
   const agentStatus = [
     { name: 'Forecast Agent', status: 'healthy', lastRun: '3 mins ago', nextRun: '2 mins' },
     { name: 'Route Agent', status: 'in-progress', lastRun: '1 min ago', nextRun: '4 mins' },
@@ -14,9 +21,27 @@ const Dashboard = () => {
   ];
 
   const alerts = [
-    { type: 'warning', message: 'Route RT003 delayed due to road construction', time: '2 mins ago' },
-    { type: 'error', message: 'Kolkata warehouse under maintenance – routes affected', time: '5 mins ago' },
-    { type: 'info', message: 'Route optimization saved ₹8,600 across 3 routes', time: '10 mins ago' },
+    { 
+      id: 'alert-1',
+      type: 'warning', 
+      message: 'Route RT003 delayed due to road construction', 
+      time: '2 mins ago',
+      agent: 'Route Agent'
+    },
+    { 
+      id: 'alert-2',
+      type: 'error', 
+      message: 'Kolkata warehouse under maintenance – routes affected', 
+      time: '5 mins ago',
+      agent: 'Inventory Agent'
+    },
+    { 
+      id: 'alert-3',
+      type: 'info', 
+      message: 'Route optimization saved ₹8,600 across 3 routes', 
+      time: '10 mins ago',
+      agent: 'Route Agent'
+    },
   ];
 
   const metrics = [
@@ -25,6 +50,14 @@ const Dashboard = () => {
     { label: 'Route Disruptions', value: '1', icon: AlertTriangle },
     { label: 'Agent Optimizations (24h)', value: '12', icon: TrendingUp },
   ];
+
+  const handleAlertClick = (alert: typeof alerts[0]) => {
+    setActiveChat({
+      alertId: alert.id,
+      agentName: alert.agent,
+      alertMessage: alert.message
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -95,7 +128,11 @@ const Dashboard = () => {
             <CardContent>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {alerts.map((alert, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-2 rounded-lg bg-logistics-panel/30 hover:bg-logistics-panel/50 cursor-pointer transition-colors">
+                  <div 
+                    key={index} 
+                    className="flex items-start space-x-3 p-2 rounded-lg bg-logistics-panel/30 hover:bg-logistics-panel/50 cursor-pointer transition-colors group"
+                    onClick={() => handleAlertClick(alert)}
+                  >
                     <div className={`w-2 h-2 rounded-full mt-2 ${
                       alert.type === 'warning' ? 'bg-logistics-warning' :
                       alert.type === 'error' ? 'bg-logistics-danger' :
@@ -104,6 +141,10 @@ const Dashboard = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white">{alert.message}</p>
                       <p className="text-xs text-gray-400 mt-1">{alert.time}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-xs text-logistics-accent">{alert.agent}</span>
+                        <MessageSquare className="w-3 h-3 text-gray-400 group-hover:text-logistics-accent transition-colors" />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -112,6 +153,20 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
+
+      {/* Agent Chat Modal */}
+      {activeChat && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md">
+            <AgentChat
+              alertId={activeChat.alertId}
+              agentName={activeChat.agentName}
+              alertMessage={activeChat.alertMessage}
+              onClose={() => setActiveChat(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
