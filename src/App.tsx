@@ -9,8 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Forecast from "./pages/Forecast";
 import Inventory from "./pages/Inventory";
 import Procurement from "./pages/Procurement";
-import Optimization from "./pages/Optimization";
-import SimulationLab from "./pages/SimulationLab";
+import RouteAgent from "./pages/RouteAgent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,8 +26,7 @@ const App = () => (
             <Route path="forecast" element={<Forecast />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="procurement" element={<Procurement />} />
-            <Route path="optimization" element={<Optimization />} />
-            <Route path="simulation" element={<SimulationLab />} />
+            <Route path="routes" element={<RouteAgent />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

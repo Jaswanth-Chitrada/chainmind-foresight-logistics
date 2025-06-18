@@ -8,22 +8,22 @@ import { RefreshCw, Activity, TrendingUp, AlertTriangle, Truck } from 'lucide-re
 const Dashboard = () => {
   const agentStatus = [
     { name: 'Forecast Agent', status: 'healthy', lastRun: '3 mins ago', nextRun: '2 mins' },
-    { name: 'Optimization Agent', status: 'in-progress', lastRun: '1 min ago', nextRun: '4 mins' },
+    { name: 'Route Agent', status: 'in-progress', lastRun: '1 min ago', nextRun: '4 mins' },
     { name: 'Inventory Agent', status: 'healthy', lastRun: '5 mins ago', nextRun: '1 min' },
     { name: 'Procurement Agent', status: 'issue', lastRun: '15 mins ago', nextRun: 'paused' },
   ];
 
   const alerts = [
-    { type: 'warning', message: 'Flood warning in Chennai – rerouting started', time: '2 mins ago' },
-    { type: 'error', message: 'Supplier A unresponsive – fallback supplier contacted', time: '5 mins ago' },
-    { type: 'info', message: 'Auto procurement triggered for Electronics', time: '10 mins ago' },
+    { type: 'warning', message: 'Route RT003 delayed due to road construction', time: '2 mins ago' },
+    { type: 'error', message: 'Kolkata warehouse under maintenance – routes affected', time: '5 mins ago' },
+    { type: 'info', message: 'Route optimization saved ₹8,600 across 3 routes', time: '10 mins ago' },
   ];
 
   const metrics = [
-    { label: 'Total Deliveries Today', value: '247', icon: Truck },
-    { label: 'Average Time per Delivery', value: '4.2h', icon: Activity },
-    { label: 'Active Disruptions', value: '3', icon: AlertTriangle },
-    { label: 'Agent Decisions (24h)', value: '156', icon: TrendingUp },
+    { label: 'Active Routes Today', value: '4', icon: Truck },
+    { label: 'Average Route Time', value: '23.7h', icon: Activity },
+    { label: 'Route Disruptions', value: '1', icon: AlertTriangle },
+    { label: 'Agent Optimizations (24h)', value: '12', icon: TrendingUp },
   ];
 
   return (

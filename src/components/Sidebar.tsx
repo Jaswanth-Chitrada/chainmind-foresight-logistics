@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, CloudRain, Package, ShoppingCart, Route, FlaskConical } from 'lucide-react';
+import { Home, CloudRain, Package, ShoppingCart, Route } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -9,8 +9,7 @@ const navigation = [
   { name: 'Forecast', href: '/forecast', icon: CloudRain },
   { name: 'Inventory', href: '/inventory', icon: Package },
   { name: 'Procurement', href: '/procurement', icon: ShoppingCart },
-  { name: 'Optimization', href: '/optimization', icon: Route },
-  { name: 'Simulation Lab', href: '/simulation', icon: FlaskConical },
+  { name: 'Route Agent', href: '/routes', icon: Route },
 ];
 
 const Sidebar = () => {
